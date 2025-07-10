@@ -2,3 +2,6 @@ fastapi
 uvicorn
 psutil
 pydantic
+pylint
+ruff
+mypy
