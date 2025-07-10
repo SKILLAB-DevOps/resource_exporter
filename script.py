@@ -1,9 +1,5 @@
-"""_summary_
-Raises:
-HTTPException: _description_
-HTTPException: _description_
-Returns:
-_type_: _description_
+"""
+WSL System Monitor API using FastAPI and Pydantic
 """
 from pathlib import Path
 import os
@@ -13,6 +9,7 @@ from pydantic import BaseModel, Field
 
 app = FastAPI(title="WSL System Monitor API with Pydantic")
 """API for monitoring system resources in WSL using FastAPI and Pydantic."""
+
 
 
 class StorageInfo(BaseModel):
@@ -154,9 +151,8 @@ async def get_logs(
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail="Permission denied") from exc
 
-
-
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0", port=8000, log_level="info")
-# This code is a FastAPI application that provides endpoints to monitor system resources in WSL.
+

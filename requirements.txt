@@ -5,3 +5,4 @@ pydantic
 pylint
 ruff
 mypy
+black
