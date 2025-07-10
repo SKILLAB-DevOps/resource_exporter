@@ -152,8 +152,8 @@ async def get_logs(
         return LogLines(
             file=str(path), lines=[ln.decode(errors="ignore") for ln in last]
         )
-    except PermissionError:
-        raise HTTPException(status_code=403, detail="Permission denied")
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail="Permission denied") from exc
 
 
 if __name__ == "__main__":
