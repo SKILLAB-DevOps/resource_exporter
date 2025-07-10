@@ -1,0 +1,7 @@
+fastapi
+pydantic
+uvicorn
+psutil
+pylint
+ruff
+black
