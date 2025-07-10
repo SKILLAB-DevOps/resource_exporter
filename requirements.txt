@@ -1,0 +1,5 @@
+pylint
+fastapi
+uvicorn
+ruff
+pre-commit
