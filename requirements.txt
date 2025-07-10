@@ -1,7 +1,8 @@
-psutil
 fastapi
+uvicorn
+psutil
 pydantic
 pylint
-black
 ruff
-uvicorn
+mypy
+black

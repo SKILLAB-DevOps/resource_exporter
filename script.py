@@ -8,11 +8,12 @@ from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="WSL System Monitor API with Pydantic")
+"""API for monitoring system resources in WSL using FastAPI and Pydantic."""
+
 
 
 class StorageInfo(BaseModel):
-    """Information about disk usage in GB.
-    """
+    """Model for disk storage information."""
     total_gb: float = Field(..., description="Total disk size in GB")
     used_gb: float = Field(..., description="Used disk in GB")
     free_gb: float = Field(..., description="Free disk in GB")
@@ -20,16 +21,14 @@ class StorageInfo(BaseModel):
 
 
 class PartitionInfo(BaseModel):
-    """Information about disk partitions.
-    """
+    """Model for disk partition information."""
     device: str
     mountpoint: str
     fstype: str
 
 
 class SystemInfo(BaseModel):
-    """Information about system resources.
-    """
+    """Model for system information."""
     cpu_percent: float = Field(..., description="Total CPU usage %")
     ram_percent: float = Field(..., description="Used RAM %")
     ram_total_gb: float = Field(..., description="Total RAM in GB")
@@ -37,8 +36,7 @@ class SystemInfo(BaseModel):
 
 
 class CPUInfo(BaseModel):
-    """Information about CPU usage and frequency.
-    """
+    """Model for CPU information."""
     overall_percent: float
     per_core: list[float]
     freq_current: float | None
@@ -47,8 +45,7 @@ class CPUInfo(BaseModel):
 
 
 class MemoryInfo(BaseModel):
-    """Information about memory usage.
-    """
+    """Model for memory information."""
     total_gb: float
     available_gb: float
     used_gb: float
@@ -60,15 +57,14 @@ class MemoryInfo(BaseModel):
 
 
 class LogLines(BaseModel):
-    """Information about log file lines.
-    """
+    """Model for log lines."""
     file: str
     lines: list[str]
 
 
 @app.get("/storage", response_model=StorageInfo)
 async def get_storage(path: str = Query("/", description="Directory path")):
-    """Get storage information for a given path."""
+    """Get disk storage information for a given path."""
     usage = psutil.disk_usage(path)
     return StorageInfo(
         total_gb=usage.total / (1024**3),
@@ -89,7 +85,7 @@ async def get_partitions():
 
 @app.get("/system", response_model=SystemInfo)
 async def get_system():
-    """Get system resource usage information.  """
+    """Get system resource usage information."""
     mem = psutil.virtual_memory()
     return SystemInfo(
         cpu_percent=psutil.cpu_percent(interval=0.5),
@@ -114,7 +110,7 @@ async def get_cpu():
 
 @app.get("/memory", response_model=MemoryInfo)
 async def get_memory():
-    """Get memory usage information."""
+    """Get memory and swap usage information."""
     mem = psutil.virtual_memory()
     swap = psutil.swap_memory()
     return MemoryInfo(
@@ -155,8 +151,8 @@ async def get_logs(
     except PermissionError as exc:
         raise HTTPException(status_code=403, detail="Permission denied") from exc
 
-
 if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0", port=8000, log_level="info")
+
