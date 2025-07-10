@@ -1,3 +1,6 @@
+"""
+WSL System Monitor API using FastAPI and Pydantic
+"""
 from pathlib import Path
 import os
 import psutil
@@ -8,6 +11,8 @@ app = FastAPI(title="WSL System Monitor API with Pydantic")
 
 
 class StorageInfo(BaseModel):
+    """Information about disk usage in GB.
+    """
     total_gb: float = Field(..., description="Total disk size in GB")
     used_gb: float = Field(..., description="Used disk in GB")
     free_gb: float = Field(..., description="Free disk in GB")
@@ -15,12 +20,16 @@ class StorageInfo(BaseModel):
 
 
 class PartitionInfo(BaseModel):
+    """Information about disk partitions.
+    """
     device: str
     mountpoint: str
     fstype: str
 
 
 class SystemInfo(BaseModel):
+    """Information about system resources.
+    """
     cpu_percent: float = Field(..., description="Total CPU usage %")
     ram_percent: float = Field(..., description="Used RAM %")
     ram_total_gb: float = Field(..., description="Total RAM in GB")
@@ -28,6 +37,8 @@ class SystemInfo(BaseModel):
 
 
 class CPUInfo(BaseModel):
+    """Information about CPU usage and frequency.
+    """
     overall_percent: float
     per_core: list[float]
     freq_current: float | None
@@ -36,6 +47,8 @@ class CPUInfo(BaseModel):
 
 
 class MemoryInfo(BaseModel):
+    """Information about memory usage.
+    """
     total_gb: float
     available_gb: float
     used_gb: float
@@ -47,12 +60,15 @@ class MemoryInfo(BaseModel):
 
 
 class LogLines(BaseModel):
+    """Information about log file lines.
+    """
     file: str
     lines: list[str]
 
 
 @app.get("/storage", response_model=StorageInfo)
 async def get_storage(path: str = Query("/", description="Directory path")):
+    """Get storage information for a given path."""
     usage = psutil.disk_usage(path)
     return StorageInfo(
         total_gb=usage.total / (1024**3),
@@ -64,6 +80,7 @@ async def get_storage(path: str = Query("/", description="Directory path")):
 
 @app.get("/storage/partitions", response_model=list[PartitionInfo])
 async def get_partitions():
+    """Get information about all disk partitions."""
     return [
         PartitionInfo(device=p.device, mountpoint=p.mountpoint, fstype=p.fstype)
         for p in psutil.disk_partitions()
@@ -72,6 +89,7 @@ async def get_partitions():
 
 @app.get("/system", response_model=SystemInfo)
 async def get_system():
+    """Get system resource usage information.  """
     mem = psutil.virtual_memory()
     return SystemInfo(
         cpu_percent=psutil.cpu_percent(interval=0.5),
@@ -83,6 +101,7 @@ async def get_system():
 
 @app.get("/cpu", response_model=CPUInfo)
 async def get_cpu():
+    """Get CPU usage and frequency information."""
     freq = psutil.cpu_freq()
     return CPUInfo(
         overall_percent=psutil.cpu_percent(interval=0.5),
@@ -95,6 +114,7 @@ async def get_cpu():
 
 @app.get("/memory", response_model=MemoryInfo)
 async def get_memory():
+    """Get memory usage information."""
     mem = psutil.virtual_memory()
     swap = psutil.swap_memory()
     return MemoryInfo(
@@ -114,6 +134,7 @@ async def get_logs(
     file: str = Query("/var/log/README", description="Log file path"),
     lines: int = Query(50, ge=1, le=500),
 ):
+    """Get the last N lines from a log file."""
     path = Path(file)
     if not (path.exists() and path.is_file()):
         raise HTTPException(status_code=404, detail="Log file not found")
