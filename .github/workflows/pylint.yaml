@@ -19,7 +19,7 @@ jobs:
         pip install uv
         uv venv
         source .venv/bin/activate
-        uv pip install fastapi uvicorn psutil pydantic
+        uv pip install fastapi uvicorn psutil pydantic pylint ruff
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
